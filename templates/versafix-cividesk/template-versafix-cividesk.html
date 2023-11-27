@@ -9,6 +9,7 @@
     @import url('//fonts.googleapis.com/css?family=Roboto|Karla|Alegreya|Open%20Sans');
     @supports -ko-blockdefs {
       id { widget: id }
+      text { label: Paragraph; widget: text }
       size { label: Size; widget: select; options: 8|9|10|11|12|13|14|15|16|18|20|22|25|28|31; }
       visible { label: Visible?; widget: boolean }
       color { label: Color; widget: color }
@@ -18,12 +19,49 @@
         max: 20;
         help: Attention - this property is not supported on all email clients (i.e. Outlook)
       }
-      face { label: Font; widget: select; options: Arial, Helvetica, sans-serif=Arial|Arial Black, Arial Black, Gadget, sans-serif=Arial Black|Comic Sans MS, Comic Sans MS5, cursive=Comic Sans|Courier New, Courier New, monospace=Courier|Georgia, serif=Georgia|Impact, sans-serif=Impact|Lucida Console, Monaco, monospace=Lucida Console|Lucida Sans Unicode, Lucida Grande, sans-serif=Lucida Sans Unicode|Times New Roman, Times, serif=Times New Roman|Verdana, Geneva, sans-serif=Verdana|Roboto=Roboto|Karla=Karla|Alegreya|Alegreya|Open Sans=Open Sans}
+      lineHeight {
+        label: Line Height;
+        widget: select;
+        options: normal=Normal|150%=1.5 Lines|200%=Double;
+        buttonsetLabels: normal=1x|150%=1.5x|200%=2x;
+      }
+      face { label: Font; widget: select; options: Arial, Helvetica, sans-serif=Arial|Arial Black, Arial Black, Gadget, sans-serif=Arial Black|Comic Sans MS, Comic Sans MS5, cursive=Comic Sans|Courier New, Courier New, monospace=Courier|Georgia, serif=Georgia|Impact, sans-serif=Impact|Lucida Console, Monaco, monospace=Lucida Console|Lucida Sans Unicode, Lucida Grande, sans-serif=Lucida Sans Unicode|Times New Roman, Times, serif=Times New Roman|Verdana, Geneva, sans-serif=Verdana|Roboto=Roboto|Karla=Karla|Alegreya|Alegreya|Open Sans=Open Sans;
+        renderHint: fontface
+      }
       decoration { label: Decoration; widget: select; options: none=None|underline=Underline }
       linksColor { label: Link Color; extend: color }
       linksDecoration { label: Underlined Links?; extend: decoration }
       buttonColor { label: Button Color; extend: color }
-      text { label: Paragraph; widget: text }
+      blockSpacing verticalSpacing {
+        label: Vertical Spacing;
+        widget: integer;
+        min: 0;
+        max: 40
+      }
+      blockSpacing horizontalSpacing {
+        label: Horizontal Spacing;
+        widget: integer;
+        min: 0;
+        max: 40
+      }
+      blockSpacing topPadding {
+        label: Top Padding;
+        widget: integer;
+        min: 0;
+        max: 40
+      }
+      blockSpacing bottomPadding {
+        label: Bottom Padding;
+        widget: integer;
+        min: 0;
+        max: 40
+      }
+      blockSpacing {
+        label: Block Spacing;
+        properties: topPadding bottomPadding verticalSpacing horizontalSpacing;
+        category: style
+        /* make sure this ends up as a style property, with inheritance/theming */
+      }
       url { label: Link; widget: url }
       src { label: Image; widget: src }
       hrWidth { label: Width; widget: select; options:10|20|30|40|50|60|70|80|90|100; }
@@ -32,7 +70,10 @@
       height { label: Height; widget: integer }
       imageHeight { label: Image Height; extend: height; }
       spacerSize { label: Height; widget: integer; max: 90; min: 4; }
-      align { label: Alignment; widget: select; options:left=Left|right=Right|center=Center}
+      align { label: Alignment; widget: select;
+         options:left=Left|right=Right|center=Center;
+         buttonsetIconClasses: left=fa fa-fw fa-align-left|center=fa fa-fw fa-align-center|right=fa fa-fw fa-align-right
+            }
       alt {
         label: Alternative Text;
         widget: text;
@@ -66,8 +107,11 @@
       textStyle:preview { -ko-bind-text: @['AaZz']; -ko-font-family: @face; -ko-color: @color; -ko-font-size: @[size]px; }
       linkStyle { label: Link; properties: face color size decoration=none }
       linkStyle:preview { -ko-bind-text: @['Link']; -ko-font-size: @[size]px; -ko-font-family: @face; -ko-color: @color; -ko-text-decoration: @[decoration] }
-      longTextStyle { label: Paragraph; properties: face color size linksColor   }
-      longTextStyle:preview { -ko-bind-text: @['AaZz']; -ko-font-family: @face; -ko-color: @color; -ko-font-size: @[size]px; }
+      longTextStyle { label: Paragraph;
+        properties: face color size lineHeight align linksColor backgroundColor  }
+      longTextStyle:preview { -ko-bind-text: @['AaZz'];
+       -ko-font-family: @face; -ko-color: @color;
+        -ko-font-size: @[size]px; -ko-background-color: @color;}
       bigButtonStyle { label: Big Button; extend: buttonStyle }
       titleTextStyle { label: Title; extend: textStyle }
       /* background */
@@ -101,11 +145,11 @@
       titleVisible { label: Show Title; extend: visible; }
       buttonVisible { label: Show Button; extend: visible; }
       imageVisible { label: Show Image; extend: visible; }
-
-      contentTheme { label: Main Style; }
-      contentTheme:preview { -ko-background-color: @[backgroundColor] }
       frameTheme { label: Frame Style; }
       frameTheme:preview { -ko-background-color: @[backgroundColor] }
+      contentTheme { label: Main Style; }
+      contentTheme:preview { -ko-background-color: @[backgroundColor] }
+
       template preheaderText { label: Preheader; }
 
       template { label: Page; theme: frameTheme ;properties:  preheaderVisible=true; version: 1.0.6; }
@@ -141,7 +185,27 @@
       sideArticleBlock imageWidth { label: Image Size; widget: select; options: 120=Small|166=Medium|258=Big; }
       sideArticleBlock { label: Image+Text Block; properties: backgroundColor titleVisible=true buttonVisible=true imageWidth=166 imagePos=left titleTextStyle longTextStyle buttonStyle  image  longText buttonLink; variant:imagePos; theme: contentTheme }
 
-      textBlock { label: Text Block; properties: backgroundColor longTextStyle longText; theme: contentTheme}
+      textBlock { label: Text Block;
+        properties: backgroundColor longTextStyle longText; theme: contentTheme}
+
+      imgTxtBlock imagePos {label:Image position;widget:select; options: left=Left|right=Right; }
+      imgTxtBlock imageWidth { label: Image Size; widget: select; options: 120=Small|166=Medium|250=Big; variant:imageWidth;}
+      imgTxtBlock { label: Text Block;
+         properties: backgroundColor longTextStyle longText image imageWidth=258;
+         variant: imagePos;
+          theme: contentTheme}
+
+    [data-ko-block=imgTxtBlock] .links-color a,
+    [data-ko-block=imgTxtBlock] .links-color a:link,
+    [data-ko-block=imgTxtBlock] .links-color a:visited,
+    [data-ko-block=imgTxtBlock] .links-color a:hover {
+      color: #3f3f3f;
+      -ko-color: @longTextStyle.linksColor;
+      text-decoration: underline;
+    }
+    [data-ko-block=imgTxtBlock] .long-text p { Margin: 1em 0px; }
+    [data-ko-block=imgTxtBlock] .long-text p:last-child { Margin-bottom: 0px; }
+    [data-ko-block=imgTxtBlock] .long-text p:first-child { Margin-top: 0px; }
 
       singleArticleBlock { label: Image/Text Block; properties: backgroundColor titleVisible=true buttonVisible=true imageVisible=true titleTextStyle longTextStyle buttonStyle  image  longText buttonLink;theme: contentTheme}
 
@@ -180,6 +244,7 @@
       hrBlock:preview,
       sideArticleBlock:preview,
       textBlock:preview,
+      imgTxtBlock:preview,
       singleArticleBlock:preview,
       doubleArticleBlock:preview,
       tripleArticleBlock:preview,
@@ -1472,7 +1537,75 @@
     </tr>
   </table>
   <!-- /socialBlock -->
+
+  <!-- imgTxtBlock -->
    
+  <table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf"
+  style="background-color: #bfbfbf; -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor"
+  data-ko-block="imgTxtBlock">
+  <tr>
+    <td class="vb-outer" align="center" valign="top" bgcolor="#bfbfbf"
+      style="background-color: #bfbfbf; -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor">
+
+      <!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="600"><tr><td align="center" valign="top"><![endif]-->
+      <table width="600" border="0" cellpadding="0" cellspacing="18" class="vb-row fullpad" bgcolor="#ffffff"
+        style="width: 100%; max-width: 570px; background-color: #ffffff; -ko-attr-bgcolor: @backgroundColor; -ko-background-color: @backgroundColor;">
+        <tr>
+          <td valign="top" class="mobile-row" align="center">
+            <div data-ko-display="imagePos eq 'left'" >
+            <!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="258" -ko-attr-width: @[imageWidth]><tr><td align="center" valign="top"><![endif]-->
+            <div data-ko-wrap="false"
+            style="float:left;padding:8px; max-width:258px;  vertical-align:top; width:100%;-ko-max-width: @[18 + Math.round(imageWidth)]px;" class="mobile-full">
+              <a data-ko-link="image.url" href="" style="float: left; font-size: 18px; font-family: Arial, Helvetica, sans-serif; color: #f3f3f3;text-decoration: none; -ko-font-size: @[externalTextStyle.size]px;-ko-font-family: @externalTextStyle.face; -ko-color: @externalTextStyle.color"><img
+                  data-ko-editable="image.src" width="258" data-ko-placeholder-height="150" style="-ko-attr-alt: @image.alt; width: 100%; max-width: 258px;
+                  -ko-attr-width: @imageWidth; -ko-max-width: @[imageWidth]px;"
+                  src="http://mosaico.io/srv/f-default/img?method=placeholder&amp;params=258%2C150" vspace="0"
+                  hspace="0" border="0" alt="" /></a>
+            </div>
+            <div class="long-text links-color" width="100%" valign="top"
+              style="font-weight: normal; color: #3f3f3f; font-size: 13px;
+               font-family: Arial, Helvetica, sans-serif; padding: 9px; padding-top: 5px; padding-bottom: 5px; padding: 9px; padding-top: 5px; padding-bottom: 5px;
+               -ko-padding: @[blockSpacing.horizontalSpacing]px; -ko-padding-top: @[blockSpacing.verticalSpacing]px; -ko-padding-bottom: @[blockSpacing.verticalSpacing]px; text-align: left;
+                line-height: normal; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face;
+                -ko-text-align: @longTextStyle.align; -ko-attr-align: @longTextStyle.align; -ko-line-height: @[longTextStyle.lineHeight]"
+              align="left" data-ko-editable="longText">
+              <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth. Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar. The Big Oxmox advised her not to do so, because there were thousands of bad Commas, wild Question Marks and devious Semikoli, but the Little Blind Text didn’t listen. Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth. Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar. The Big Oxmox advised her not to do so, because there were thousands of bad Commas, wild Question Marks and devious Semikoli, but the Little Blind Text didn’t listen.</p>
+            </div>
+            <!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->
+          </div> <!-- left -->
+          <div data-ko-display="imagePos eq 'right'" >
+            <!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="258" -ko-attr-width: @[imageWidth]><tr><td align="center" valign="top"><![endif]-->
+            <div data-ko-wrap="false"
+            style="float:right;padding:8px; max-width:258px;  vertical-align:top; width:100%;-ko-max-width: @[18 + Math.round(imageWidth)]px;" class="mobile-full">
+              <a data-ko-link="image.url" href="" style="float: right; font-size: 18px; font-family: Arial, Helvetica, sans-serif; color: #f3f3f3;text-decoration: none; -ko-font-size: @[externalTextStyle.size]px;-ko-font-family: @externalTextStyle.face; -ko-color: @externalTextStyle.color"><img
+                  data-ko-editable="image.src" width="258" data-ko-placeholder-height="150" style="-ko-attr-alt: @image.alt; width: 100%; max-width: 258px;
+                  -ko-attr-width: @imageWidth; -ko-max-width: @[imageWidth]px;"
+                  src="http://mosaico.io/srv/f-default/img?method=placeholder&amp;params=258%2C150" vspace="0"
+                  hspace="0" border="0" alt="" /></a>
+            </div>
+            <div class="long-text links-color" width="100%" valign="top"
+            style="font-weight: normal; color: #3f3f3f; font-size: 13px;
+               font-family: Arial, Helvetica, sans-serif; padding: 9px; padding-top: 5px; padding-bottom: 5px; padding: 9px; padding-top: 5px; padding-bottom: 5px;
+               -ko-padding: @[blockSpacing.horizontalSpacing]px; -ko-padding-top: @[blockSpacing.verticalSpacing]px; -ko-padding-bottom: @[blockSpacing.verticalSpacing]px; text-align: right;
+               line-height: normal; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; 
+               -ko-line-height: @[longTextStyle.lineHeight]"
+              align="right" data-ko-editable="longText">
+            <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth. Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar. The Big Oxmox advised her not to do so, because there were thousands of bad Commas, wild Question Marks and devious Semikoli, but the Little Blind Text didn’t listen. Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth. Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar. The Big Oxmox advised her not to do so, because there were thousands of bad Commas, wild Question Marks and devious Semikoli, but the Little Blind Text didn’t listen.</p>
+            </div>
+              <!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->
+
+          </div> <!-- right -->
+          </td>
+        </tr>
+      </table>
+      <!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->
+
+    </td>
+  </tr>
+</table>
+
+  <!-- /imgTxtBlock -->
+
   </div>
 
   </center>
